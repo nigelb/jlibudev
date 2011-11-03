@@ -1,0 +1,10 @@
+
+
+-package jlibudev.generated
+
+-runtime JNA
+
+
+-library udev        target/checkout/libudev/libudev.h target/checkout/libudev/libudev-types.h
+
+
