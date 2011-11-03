@@ -1,5 +1,5 @@
 /*
-* jlibudev provides JNA access to udev.
+* jlibudev provides JNA access to libudev.
 * Copyright (C) 2011 NigelB
 *
 * This program is free software; you can redistribute it and/or
