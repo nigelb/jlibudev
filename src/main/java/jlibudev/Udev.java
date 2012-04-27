@@ -78,5 +78,10 @@ public class Udev {
         return new UdevDevice(la, la.udev_device_new_from_environment(udev));
     }
 
+    protected UdevLibrary.udev getInternal()
+    {
+        return udev;
+    }
+
 
 }

@@ -39,7 +39,7 @@ public class UdevListEntry {
 
     public UdevDevice getDevice()
     {
-        return new UdevDevice(la, la.udev_device_new_from_syspath(udev.udev, getName()));
+        return new UdevDevice(la, la.udev_device_new_from_syspath(udev.getInternal(), getName()));
     }
 
     public String getName()
