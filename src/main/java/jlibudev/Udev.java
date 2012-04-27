@@ -19,28 +19,40 @@
 
 package jlibudev;
 
+import com.sun.jna.NativeLong;
 import jlibudev.generated.UdevLibrary;
-import jlibudev.generated.udev;
+//import jlibudev.generated.udev;
 
 /**
- * <code>Udev</code> wraps {@link udev} and provides convenience methods.
+ * <code>Udev</code> wraps a udev pointer and provides convenience methods.
  *
  *
  * @Author NigelB
  */
 public class Udev {
     private UdevLibrary la;
-    udev udev;
+    private UdevLibrary.udev udev;
 
-    Udev(UdevLibrary la, udev udev) {
+    Udev(UdevLibrary la, UdevLibrary.udev udev) {
         this.la = la;
         this.udev = udev;
     }
 
     public String getSysPath()
     {
-        return udev.sys_path.getString(0);
+        return la.udev_get_sys_path(udev);
     }
+
+    public String getRunPath()
+    {
+        return la.udev_get_run_path(udev);
+    }
+
+    public String getDevPath()
+    {
+        return la.udev_get_dev_path(udev);
+    }
+
     public  UdevMonitor createMonitor(String name)
     {
         return new UdevMonitor(la, la.udev_monitor_new_from_netlink(udev, name));
@@ -51,15 +63,20 @@ public class Udev {
         return new UdevEnumerate(la, la.udev_enumerate_new(udev), this);
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        try{
-            if(udev != null)
-            {
-//                la.udev_unref(udev);
-            }
-        }finally {
-            super.finalize();
-        }
+    public UdevDevice udev_device_new_from_devnum(byte type, long dev_num)
+    {
+        return new UdevDevice(la, la.udev_device_new_from_devnum(udev, type, new NativeLong(dev_num)));
     }
+
+    public UdevDevice udev_device_new_from_subsystem_sysname(String subsystem, String sysname)
+    {
+        return new UdevDevice(la, la.udev_device_new_from_subsystem_sysname(udev, subsystem, sysname));
+    }
+
+    public UdevDevice udev_device_new_from_environment()
+    {
+        return new UdevDevice(la, la.udev_device_new_from_environment(udev));
+    }
+
+
 }

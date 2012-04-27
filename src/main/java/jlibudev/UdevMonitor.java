@@ -20,36 +20,54 @@
 package jlibudev;
 
 import jlibudev.generated.UdevLibrary;
-import jlibudev.generated.udev_monitor;
 
 /**
- * <code>UdevMonitor</code> wraps {@link udev_monitor} and provides convenience methods.
+ * <code>UdevMonitor</code> wraps a udev_monitor pointer and provides convenience methods.
  * to its functions.
  *
  * @Author NigelB
  */
 public class UdevMonitor {
     private UdevLibrary la;
-    udev_monitor udev_monitor;
+    UdevLibrary.udev_monitor udev_monitor;
 
-    public UdevMonitor(UdevLibrary la, udev_monitor udev_monitor) {
+    public UdevMonitor(UdevLibrary la, UdevLibrary.udev_monitor udev_monitor) {
         this.la = la;
         this.udev_monitor = udev_monitor;
     }
 
-    public void udev_monitor_filter_add_match_subsystem_devtype(String subsystem, String devtypes) {
-        la.udev_monitor_filter_add_match_subsystem_devtype(udev_monitor, subsystem, devtypes);
-    }
-
-    public void udev_monitor_enable_receiving() {
+    public void enable() {
         la.udev_monitor_enable_receiving(udev_monitor);
     }
 
-    public int udev_monitor_get_fd() {
+    public int getFD() {
         return la.udev_monitor_get_fd(udev_monitor);
     }
 
-    public UdevDevice udev_monitor_receive_device() {
+    public UdevDevice receiveDevice() {
         return new UdevDevice(la, la.udev_monitor_receive_device(udev_monitor));
+    }
+
+    public int setReceiveBufferSize(int size){
+        return la.udev_monitor_set_receive_buffer_size(udev_monitor, size);
+    }
+
+    public void filterAddMatchSubsystemDevtype(String subsystem, String devtypes) {
+        la.udev_monitor_filter_add_match_subsystem_devtype(udev_monitor, subsystem, devtypes);
+    }
+
+    public int filterAddMatchTag(String tag)
+    {
+        return la.udev_monitor_filter_add_match_tag(udev_monitor, tag);
+    }
+
+    public int filterUpdate()
+    {
+        return la.udev_monitor_filter_update(udev_monitor);
+    }
+
+    public int filterRemove()
+    {
+        return la.udev_monitor_filter_remove(udev_monitor);
     }
 }

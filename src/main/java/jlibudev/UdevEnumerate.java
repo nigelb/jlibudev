@@ -20,39 +20,84 @@
 package jlibudev;
 
 import jlibudev.generated.UdevLibrary;
-import jlibudev.generated.udev_enumerate;
-import jlibudev.generated.udev_list_entry;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
- * <code>UdevEnumerate</code> wraps {@link udev_enumerate} and provides convenience methods.
+ * <code>UdevEnumerate</code> wraps a udev_enumerate pointer and provides convenience methods.
  *
  * @Author NigelB
  */
 public class UdevEnumerate {
     private UdevLibrary la;
-    private udev_enumerate udev_enumerate;
+    private UdevLibrary.udev_enumerate udev_enumerate;
     private Udev udev;
 
-    public UdevEnumerate(UdevLibrary la, udev_enumerate udev_enumerate, Udev udev) {
+    public UdevEnumerate(UdevLibrary la, UdevLibrary.udev_enumerate udev_enumerate, Udev udev) {
         this.la = la;
         this.udev_enumerate = udev_enumerate;
         this.udev = udev;
     }
 
-    public int udev_enumerate_add_match_subsystem(String subsystem) {
+    public int addMatchSubsystem(String subsystem) {
         return la.udev_enumerate_add_match_subsystem(udev_enumerate, subsystem);
     }
 
+    public int addSysPath(String syspath)
+    {
+        return la.udev_enumerate_add_syspath(udev_enumerate, syspath);
+    }
+
+    public int addNomatchSubsystem(String subsystem)
+    {
+        return la.udev_enumerate_add_nomatch_subsystem(udev_enumerate, subsystem);
+    }
+
+    public int addMatchSysattr(String sysattr, String value)
+    {
+        return la.udev_enumerate_add_match_sysattr(udev_enumerate, sysattr, value);
+    }
+
+    public int addNomatchSysattr(String sysattr, String value)
+    {
+        return la.udev_enumerate_add_nomatch_sysattr(udev_enumerate, sysattr, value);
+    }
+
+    public int addMatchProperty(String property, String value)
+    {
+        return la.udev_enumerate_add_match_property(udev_enumerate, property, value);
+    }
+
+    public int addMatchSysname(String sysname)
+    {
+        return la.udev_enumerate_add_match_sysname(udev_enumerate, sysname);
+    }
+
+    public int addMatchTag(String tag)
+    {
+        return la.udev_enumerate_add_match_tag(udev_enumerate, tag);
+    }
+
+    public int addMatchParent(UdevDevice parent)
+    {
+        return la.udev_enumerate_add_match_parent(udev_enumerate, parent.getInternal());
+    }
+
+    public int addMatchIsInitialized()
+    {
+        return la.udev_enumerate_add_match_is_initialized(udev_enumerate);
+    }
+
+    public int scanSubSubsystems()
+    {
+        return la.udev_enumerate_scan_subsystems(udev_enumerate);
+    }
 
     public Iterator<UdevListEntry> getScanIterator() {
-        ArrayList<UdevListEntry> toRet = new ArrayList();
-
         la.udev_enumerate_scan_devices(udev_enumerate);
         return new Iterator<UdevListEntry>() {
-            udev_list_entry list_entry = la.udev_enumerate_get_list_entry(udev_enumerate);
+            UdevLibrary.udev_list_entry list_entry = la.udev_enumerate_get_list_entry(udev_enumerate);
 
             public boolean hasNext() {
                 return list_entry != null;
@@ -70,15 +115,4 @@ public class UdevEnumerate {
         };
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        try {
-            if (udev_enumerate != null) {
-                la.udev_enumerate_unref(udev_enumerate);
-            }
-        } finally {
-            super.finalize();
-        }
-
-    }
 }

@@ -33,23 +33,19 @@ public class UdevEnumerationExample {
     public static void main(String[] args) {
         Udev ud = jlibUdev.createUdev();
         UdevEnumerate enu = ud.createEnumeration();
-        enu.udev_enumerate_add_match_subsystem("hidraw");
+        enu.addMatchSubsystem("hidraw");
         Iterator<UdevListEntry> di = enu.getScanIterator();
         UdevDevice parent;
         while (di.hasNext()) {
             UdevListEntry next = di.next();
             parent = next.getDevice().udev_device_get_parent_with_subsystem_devtype("usb", "usb_device");
+
             if(parent == null)
             {
                 System.out.println("Unable to find parent usb device.");
                 System.exit(1);
             }
-            System.out.println(next.getName());
-            System.out.println(parent.getSysPath());
-            String[] keys = parent.getSysattrKeys();
-            for (String key : keys) {
-                System.out.printf("\t--%s: %s%n", key, parent.getSysattrValue(key));
-            }
+            System.out.println(next.getDevice());
         }
     }
 }

@@ -20,23 +20,27 @@
 package jlibudev;
 
 import jlibudev.generated.UdevLibrary;
-import jlibudev.generated.udev_device;
 
 import java.io.File;
 import java.io.FilenameFilter;
 
 /**
- * <code>Udev</code> wraps {@link udev_device} and provides convenience methods.
+ * <code>Udev</code> wraps udev_device and provides convenience methods.
  *
  * @Author NigelB
  */
 public class UdevDevice {
     private UdevLibrary la;
-    private udev_device udev_device;
+    private UdevLibrary.udev_device udev_device;
 
-    public UdevDevice(UdevLibrary la, udev_device udev_device) {
+    public UdevDevice(UdevLibrary la, UdevLibrary.udev_device udev_device) {
         this.la = la;
         this.udev_device = udev_device;
+    }
+
+    public Udev getUdev()
+    {
+        return new Udev(la, la.udev_device_get_udev(udev_device));
     }
 
     public UdevDevice getParent() {
@@ -45,53 +49,37 @@ public class UdevDevice {
 
 
     public String getDevnode() {
-        if (udev_device.devnode == null) {
-            return null;
-        }
-        return udev_device.devnode.getString(0);
+        return la.udev_device_get_devnode(udev_device);
     }
 
     public String getSysPath() {
-        if (udev_device.syspath == null) {
-            return null;
-        }
-        return udev_device.syspath.getString(0);
+        return la.udev_device_get_syspath(udev_device);
     }
 
     public String getDevPath() {
-        if (udev_device.devpath == null) {
-            return null;
-        }
-        return udev_device.devpath.getString(0);
+        return la.udev_device_get_devpath(udev_device);
     }
 
 
     public String getSubsystem() {
-        if (udev_device.subsystem == null) {
-            return null;
-        }
-        return udev_device.subsystem.getString(0);
+        return la.udev_device_get_subsystem(udev_device);
     }
 
     public String getDevtype() {
-        if (udev_device.devtype == null) {
-            return null;
-        }
-        return udev_device.devtype.getString(0);
+        return la.udev_device_get_devtype(udev_device);
     }
 
     public String getDriver() {
-        if (udev_device.driver == null) {
-            return null;
-        }
-        return udev_device.driver.getString(0);
+        return la.udev_device_get_driver(udev_device);
     }
 
     public String getAction() {
-        if (udev_device.action == null) {
-            return null;
-        }
-        return udev_device.action.getString(0);
+        return la.udev_device_get_action(udev_device);
+    }
+
+    public String getSysName()
+    {
+        return la.udev_device_get_sysname(udev_device);
     }
 
     public UdevDevice udev_device_get_parent_with_subsystem_devtype(String subsystem, String devtype) {
@@ -111,26 +99,11 @@ public class UdevDevice {
         File f = new File(getSysPath());
         return f.list(new FilenameFilter() {
             public boolean accept(File dir, String name) {
-                if (new File(dir, name).isDirectory()) {
-                    return false;
-                }
-                return true;
+                return !new File(dir, name).isDirectory();
             }
         });
 
     }
-
-    @Override
-    protected void finalize() throws Throwable {
-        try {
-            if (udev_device != null) {
-//                la.udev_device_unref(udev_device);
-            }
-        } finally {
-            super.finalize();
-        }
-    }
-
 
     @Override
     public String toString() {
@@ -141,8 +114,22 @@ public class UdevDevice {
                 String.format("Node: %s, ", getDevnode())).append(
                 String.format("Subsystem: %s, ", getSubsystem())).append(
                 String.format("Devtype: %s, ", getDevtype())).append(
-                String.format("Driver: %s.", getDriver()));
+                String.format("SysName: %s, ", getSysName())).append(
+                String.format("Driver: %s", getDriver()));
+        String del = "";
+        if (getAction() == null || getAction().equals("add")) {
+            buf.append(", Keys: [");
+            for (String s : getSysattrKeys()) {
+                buf.append(del).append(s).append(": ").append(getSysattrValue(s));
+                del=", ";
+            }
+            buf.append("]");
+        }
         return buf.toString();
 
+    }
+
+    protected UdevLibrary.udev_device getInternal() {
+        return udev_device;
     }
 }

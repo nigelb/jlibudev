@@ -13,7 +13,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <udev.version>164</udev.version>
+        <udev.version>175</udev.version>
     </properties>
 
     <scm>
@@ -41,9 +41,9 @@
             <version>4.8.2</version>
         </dependency>
         <dependency>
-            <groupId>com.jnaerator</groupId>
+            <groupId>com.nativelibs4java</groupId>
             <artifactId>jnaerator-runtime</artifactId>
-            <version>0.9.7</version>
+            <version>0.11-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -112,7 +112,7 @@
                                     <executable>./autogen.sh</executable>
                                     <workingDirectory>${project.build.directory}/checkout/</workingDirectory>
                                     <environmentVariables>
-                                        <CFLAGES>$CFLAGE -g</CFLAGES>
+                                        <CFLAGES>$CFLAG -g</CFLAGES>
                                     </environmentVariables>
                                     <arguments>
                                         <argument>--without-selinux</argument>
@@ -159,9 +159,9 @@
                         </executions>
                     </plugin>
                     <plugin>
-                        <groupId>com.jnaerator</groupId>
+                        <groupId>com.nativelibs4java</groupId>
                         <artifactId>maven-jnaerator-plugin</artifactId>
-                        <version>0.9.9-SNAPSHOT</version>
+                        <version>0.11-SNAPSHOT</version>
                         <executions>
                             <execution>
                                 <phase>generate-sources</phase>

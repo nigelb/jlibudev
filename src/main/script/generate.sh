@@ -4,4 +4,4 @@
 #http://fedorapeople.org/~acme/dwarves/
 #
 
-pahole `find $1 | grep so$ | grep -v gudev` > $2/libudev-types.h
+#pahole `find $1 | grep so$ | grep -v gudev` > $2/libudev-types.h

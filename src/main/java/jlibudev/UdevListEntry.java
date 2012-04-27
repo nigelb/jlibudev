@@ -20,19 +20,18 @@
 package jlibudev;
 
 import jlibudev.generated.UdevLibrary;
-import jlibudev.generated.udev_list_entry;
 
 /**
- * <code>UdevListEntry</code> wraps {@link udev_list_entry} and provides convenience methods.
+ * <code>UdevListEntry</code> wraps a udev_list_entry pointer and provides convenience methods.
  *
  * @Author NigelB
  */
 public class UdevListEntry {
     private UdevLibrary la;
-    private udev_list_entry list_entry;
+    private UdevLibrary.udev_list_entry list_entry;
     private Udev udev;
 
-    public UdevListEntry(UdevLibrary la, udev_list_entry list_entry, Udev udev) {
+    public UdevListEntry(UdevLibrary la, UdevLibrary.udev_list_entry list_entry, Udev udev) {
         this.la = la;
         this.list_entry = list_entry;
         this.udev = udev;
@@ -45,7 +44,12 @@ public class UdevListEntry {
 
     public String getName()
     {
-        return list_entry.name.getString(0);
+        return la.udev_list_entry_get_name(list_entry);
+    }
+
+    public String getValue()
+    {
+        return la.udev_list_entry_get_value(list_entry);
     }
 
 }

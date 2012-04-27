@@ -27,12 +27,11 @@ import jlibudev.generated.UdevLibrary;
  * @Author NigelB
  */
 public class jlibUdev {
-    private static UdevLibrary la = UdevLibrary.INSTANCE;
+    private final static UdevLibrary la = UdevLibrary.INSTANCE;
 
     /**
      * <code>createUdev</code> creates and returns a wrapped udev.
      *
-     * @return
      */
     public static Udev createUdev()
     {

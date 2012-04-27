@@ -41,9 +41,9 @@ public class UdevMonitorExample {
     public static void main(String[] args) {
         Udev ud = jlibUdev.createUdev();
         UdevMonitor mon = ud.createMonitor("udev");
-        mon.udev_monitor_filter_add_match_subsystem_devtype(null, null);
-        mon.udev_monitor_enable_receiving();
-        int fd = mon.udev_monitor_get_fd();
+        mon.filterAddMatchSubsystemDevtype(null, null);
+        mon.enable();
+        int fd = mon.getFD();
 
         FDSet fds = JTermios.newFDSet();
         TimeVal tv = new TimeVal();
@@ -61,14 +61,10 @@ public class UdevMonitorExample {
             if (ret > 0 && FD_ISSET(fd, fds)) {
                 System.out.println("\nselect() says there should be data");
 
-                UdevDevice dev = mon.udev_monitor_receive_device();
+                UdevDevice dev = mon.receiveDevice();
 
                 if (dev != null) {
-                    System.out.format("Action: %s, ", dev.getAction());
-                    System.out.format("Node: %s, ", dev.getDevnode());
-                    System.out.format("Subsystem: %s, ", dev.getSubsystem());
-                    System.out.format("Devtype: %s, ", dev.getDevtype());
-                    System.out.format("Driver: %s.\n", dev.getDriver());
+                    System.out.println(dev);
                 } else {
                     System.out.println("No Device from receive_device(). An error occured.");
                 }
