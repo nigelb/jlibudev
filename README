@@ -1,1 +1,7 @@
 jlibudev consists of a jnaerator generated library for libudev with some convenience classes and some examples.
+That is java libudev bindings.
+
+
+Depends:
+    https://github.com/nyholku/purejavacomm
+    https://github.com/ochafik/nativelibs4java
