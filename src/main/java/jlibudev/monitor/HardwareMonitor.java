@@ -23,24 +23,30 @@ import jlibudev.*;
 import jtermios.FDSet;
 import jtermios.JTermios;
 import jtermios.TimeVal;
+import org.apache.log4j.Logger;
 
 import java.util.Iterator;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import static jtermios.JTermios.*;
 
 /**
- * Date: 4/27/12
- * Time: 2:43 PM
+ * <code>HardwareMonitor</code> monitors hardware changes and notifies listeners of these changes.
  *
  * @Author NigelB
  */
 public class HardwareMonitor implements Runnable {
-    private Thread t;
+    private static Logger logger = Logger.getLogger(HardwareMonitor.class);
+    private Thread t, dispatcher;
     private boolean running = false;
     private boolean enumerate;
     private boolean daemonize;
     private Udev ud = jlibUdev.createUdev();
     private UdevMonitor mon = ud.createMonitor("udev");
+    private LinkedBlockingQueue<UdevDevice> devices = new LinkedBlockingQueue<UdevDevice>();
+    private CopyOnWriteArrayList<DeviceListener> listeners = new CopyOnWriteArrayList<DeviceListener>();
 
 
     public HardwareMonitor(boolean enumerate) {
@@ -52,14 +58,26 @@ public class HardwareMonitor implements Runnable {
         this.daemonize = demonize;
     }
 
+    public void addListener(DeviceListener listener)
+    {
+        listeners.add(listener);
+    }
+
+    public void removeListener(DeviceListener listener)
+    {
+        listeners.remove(listener);
+    }
+
     public void run() {
         if (enumerate) {
             UdevEnumerate enu = ud.createEnumeration();
             Iterator<UdevListEntry> di = enu.getScanIterator();
             UdevListEntry entry;
+            UdevDevice dev;
             while (di.hasNext()) {
                 entry = di.next();
-                System.out.println(entry);
+                dev = entry.getDevice();
+                devices.offer(dev);
             }
         }
         mon.enable();
@@ -78,32 +96,61 @@ public class HardwareMonitor implements Runnable {
             int ret = select(fd + 1, fds, null, null, tv);
 
             if (ret > 0 && FD_ISSET(fd, fds)) {
-                System.out.println("\nselect() says there should be data");
+                logger.trace("select() says there should be data");
 
                 UdevDevice dev = mon.receiveDevice();
 
                 if (dev != null) {
-                    System.out.println(dev);
+                    devices.offer(dev);
                 } else {
-                    System.out.println("No Device from receive_device(). An error occured.");
+                    logger.error("No Device from receive_device(). An error occurred.");
                 }
             }
-            System.out.print(".");
         }
 
     }
 
-    public void start() {
-        if (t == null) {
+    private void dispatch()
+    {
+        UdevDevice dev;
+        while(running)
+        {
+            try {
+                dev = devices.poll(200, TimeUnit.MILLISECONDS);
+                if(dev != null)
+                {
+                    for (DeviceListener listener : listeners) {
+                        listener.deviceEvent(dev);
+                    }
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void start() throws AlreadyRunningException {
+        if (t == null && dispatcher == null) {
             running = true;
             t = new Thread(this);
             t.setName("Udev Hardware Monitor");
+
+            dispatcher = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    HardwareMonitor.this.dispatch();
+                }
+            });
+            dispatcher.setName("Udev Device Dispatcher");
             if (daemonize) {
                 t.setDaemon(daemonize);
+                dispatcher.setDaemon(daemonize);
             }
             t.start();
-        } else {
+            dispatcher.start();
 
+        } else {
+            throw new AlreadyRunningException("The Hardware Monitor is already running.");
         }
     }
 
@@ -114,15 +161,13 @@ public class HardwareMonitor implements Runnable {
         {
             try {
                 t.join();
+                t = null;
+                dispatcher.join();
+                dispatcher = null;
             } catch (InterruptedException e) {
-//                logger.throwing();
+                logger.debug("Interrupted", e);
             }
         }
-    }
-
-    public static void main(String[] args) {
-        HardwareMonitor hm = new HardwareMonitor(true);
-        hm.start();
     }
 
 }

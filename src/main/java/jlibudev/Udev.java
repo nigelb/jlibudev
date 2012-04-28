@@ -21,7 +21,6 @@ package jlibudev;
 
 import com.sun.jna.NativeLong;
 import jlibudev.generated.UdevLibrary;
-//import jlibudev.generated.udev;
 
 /**
  * <code>Udev</code> wraps a udev pointer and provides convenience methods.
