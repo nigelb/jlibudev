@@ -27,5 +27,7 @@ import jlibudev.UdevDevice;
  * @author NigelB
  */
 public interface DeviceListener {
-    public void deviceEvent(UdevDevice dev);
+    public void addDevice(UdevDevice dev);
+    public void removeDevice(UdevDevice dev);
+    public void enumerateDevice(UdevDevice dev);
 }

@@ -119,8 +119,9 @@ public class HardwareMonitor implements Runnable {
                 dev = devices.poll(200, TimeUnit.MILLISECONDS);
                 if(dev != null)
                 {
+                    ActionMultiplexer action = ActionMultiplexer.findAction(dev.getAction());
                     for (DeviceListener listener : listeners) {
-                        listener.deviceEvent(dev);
+                        action.fireEvent(listener, dev);
                     }
                 }
             } catch (InterruptedException e) {

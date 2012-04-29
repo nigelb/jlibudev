@@ -34,8 +34,18 @@ public class HardwareMonitorExample {
         HardwareMonitor hm = new HardwareMonitor(true);
         hm.addListener(new DeviceListener() {
             @Override
-            public void deviceEvent(UdevDevice dev) {
-                System.out.println(dev.getDevPath());
+            public void addDevice(UdevDevice dev) {
+                System.out.println("Added: "+dev.getDevPath());
+            }
+
+            @Override
+            public void removeDevice(UdevDevice dev) {
+                System.out.println("Removed: "+dev.getDevPath());
+            }
+
+            @Override
+            public void enumerateDevice(UdevDevice dev) {
+                System.out.println("Enumerated: "+dev.getDevPath());
             }
         });
         hm.start();
