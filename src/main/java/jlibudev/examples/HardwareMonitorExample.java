@@ -25,7 +25,7 @@ import jlibudev.monitor.DeviceListener;
 import jlibudev.monitor.HardwareMonitor;
 
 /**
- * <code>HardwareMonitorExample</code> a simple example using the {@link }HardwareMonitor}
+ * <code>HardwareMonitorExample</code> a simple example using the {@link HardwareMonitor}
  *
  * @author NigelB
  */

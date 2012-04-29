@@ -4,7 +4,7 @@
 
     <groupId>jlibudev</groupId>
     <artifactId>jlibudev</artifactId>
-    <version>0.0.1-${udev.version}-SNAPSHOT</version>
+    <version>0.0.1-175-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>jlibudev</name>
@@ -14,25 +14,14 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <udev.version>175</udev.version>
+        <jnaerator.version>0.10</jnaerator.version>
     </properties>
 
     <scm>
-        <connection>scm:git:git://git.kernel.org/pub/scm/linux/hotplug/udev.git</connection>
+        <developerConnection>scm:git:https://github.com/nigelb/jlibudev.git</developerConnection>
+        <connection>scm:git:http://github.com/nigelb/jlibudev.git</connection>
+        <url>https://github.com/nigelb/jlibudev</url>
     </scm>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>nativelibs4java-pluginRepo</id>
-            <url>http://nativelibs4java.sourceforge.net/maven</url>
-        </pluginRepository>
-    </pluginRepositories>
-    <repositories>
-        <repository>
-            <id>nativelibs4java-repo</id>
-            <name>NativeLibs4Java Maven Repository</name>
-            <url>http://nativelibs4java.sourceforge.net/maven</url>
-        </repository>
-    </repositories>
 
     <dependencies>
         <dependency>
@@ -43,16 +32,15 @@
         <dependency>
             <groupId>com.nativelibs4java</groupId>
             <artifactId>jnaerator-runtime</artifactId>
-            <version>0.11-SNAPSHOT</version>
+            <version>${jnaerator.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.sparetimelabs</groupId>
             <artifactId>purejavacomm</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.5</version>
         </dependency>
     </dependencies>
-
 
     <build>
         <plugins>
@@ -83,6 +71,7 @@
                         <artifactId>maven-scm-plugin</artifactId>
                         <version>1.3</version>
                         <configuration>
+                            <connectionUrl>scm:git:git://git.kernel.org/pub/scm/linux/hotplug/udev.git</connectionUrl>
                             <skipCheckoutIfExists>true</skipCheckoutIfExists>
                             <scmVersion>${udev.version}</scmVersion>
                             <scmVersionType>tag</scmVersionType>
@@ -97,85 +86,9 @@
                         </executions>
                     </plugin>
                     <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <version>1.1</version>
-                        <executions>
-                            <execution>
-                                <id>delete test</id>
-                                <phase>generate-sources</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>rm</executable>
-                                    <workingDirectory>${project.build.directory}/checkout/</workingDirectory>
-                                    <arguments>
-                                        <argument>-Rf</argument>
-                                        <argument>test</argument>
-                                    </arguments>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>build_udev_with_debugging</id>
-                                <phase>generate-sources</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>./autogen.sh</executable>
-                                    <workingDirectory>${project.build.directory}/checkout/</workingDirectory>
-                                    <environmentVariables>
-                                        <CFLAGES>$CFLAG -g</CFLAGES>
-                                    </environmentVariables>
-                                    <arguments>
-                                        <argument>--without-selinux</argument>
-                                    </arguments>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>compile</id>
-                                <phase>generate-sources</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>make</executable>
-                                    <workingDirectory>${project.build.directory}/checkout/</workingDirectory>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>generate-headers</id>
-                                <phase>generate-sources</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>src/main/script/generate.sh</executable>
-                                    <arguments>
-                                        <argument>${project.build.directory}/checkout/</argument>
-                                        <argument>${project.build.directory}/checkout/libudev/</argument>
-                                    </arguments>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>fix_code</id>
-                                <phase>generate-resources</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>src/main/script/fix_code.sh</executable>
-                                    <workingDirectory>src/main/java/jlibudev/generated
-                                    </workingDirectory>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
                         <groupId>com.nativelibs4java</groupId>
                         <artifactId>maven-jnaerator-plugin</artifactId>
-                        <version>0.11-SNAPSHOT</version>
+                        <version>${jnaerator.version}</version>
                         <executions>
                             <execution>
                                 <phase>generate-sources</phase>

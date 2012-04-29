@@ -41,7 +41,4 @@ public class AlreadyRunningException extends Exception {
         super(cause);
     }
 
-    protected AlreadyRunningException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
 }

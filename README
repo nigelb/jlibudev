@@ -4,4 +4,4 @@ That is java libudev bindings.
 
 Depends:
     https://github.com/nyholku/purejavacomm
-    https://github.com/ochafik/nativelibs4java
+        Checkout it out and run mvn install
