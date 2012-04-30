@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static jtermios.JTermios.*;
 
@@ -47,7 +48,7 @@ public class HardwareMonitor implements Runnable {
     private UdevMonitor mon = ud.createMonitor("udev");
     private LinkedBlockingQueue<UdevDevice> devices = new LinkedBlockingQueue<UdevDevice>();
     private CopyOnWriteArrayList<DeviceListener> listeners = new CopyOnWriteArrayList<DeviceListener>();
-
+    private AtomicBoolean enumerated = new AtomicBoolean(false);
 
     public HardwareMonitor(boolean enumerate) {
         this(enumerate, false);
@@ -68,6 +69,10 @@ public class HardwareMonitor implements Runnable {
         listeners.remove(listener);
     }
 
+    public boolean hasEnumerated() {
+        return enumerated.get();
+    }
+
     public void run() {
         if (enumerate) {
             UdevEnumerate enu = ud.createEnumeration();
@@ -79,6 +84,10 @@ public class HardwareMonitor implements Runnable {
                 dev = entry.getDevice();
                 devices.offer(dev);
             }
+        }
+        enumerated.set(true);
+        synchronized (this) {
+            notifyAll();
         }
         mon.enable();
         int fd = mon.getFD();
