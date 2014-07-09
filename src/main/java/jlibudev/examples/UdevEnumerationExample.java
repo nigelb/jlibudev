@@ -33,12 +33,13 @@ public class UdevEnumerationExample {
     public static void main(String[] args) {
         Udev ud = jlibUdev.createUdev();
         UdevEnumerate enu = ud.createEnumeration();
-        enu.addMatchSubsystem("hidraw");
+//        enu.addMatchSubsystem("hidraw");
         Iterator<UdevListEntry> di = enu.getScanIterator();
         UdevDevice parent;
         while (di.hasNext()) {
             UdevListEntry next = di.next();
-            parent = next.getDevice().udev_device_get_parent_with_subsystem_devtype("usb", "usb_device");
+//            parent = next.getDevice().udev_device_get_parent_with_subsystem_devtype("usb", "usb_device");
+            parent = next.getDevice();
 
             if(parent == null)
             {
